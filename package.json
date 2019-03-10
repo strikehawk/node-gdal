@@ -3,7 +3,7 @@
   "version": "0.9.8",
   "description": "Bindings to GDAL (Geospatial Data Abstraction Library)",
   "license": "Apache-2.0",
-  "url": "http://github.com/naturalatlas/node-gdal",
+  "url": "http://github.com/strikehawk/node-gdal",
   "main": "./lib/gdal.js",
   "keywords": [
     "gdal",
@@ -29,7 +29,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git://github.com/naturalatlas/node-gdal.git"
+    "url": "git://github.com/strikehawk/node-gdal.git"
   },
   "author": {
     "name": "Brandon Reavis",
@@ -37,6 +37,8 @@
     "email": "brandon@naturalatlas.com"
   },
   "scripts": {
+    "configure": "./node_modules/.bin/node-pre-gyp -v rebuild",
+    "build": "./node_modules/.bin/node-gyp build",
     "test": "mocha test -R tap --timeout 600000 --no-colors -gc --require ./test/_common.js",
     "test-syntax": "eslint lib test --fix",
     "install": "node-pre-gyp install --fallback-to-build",
