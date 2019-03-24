@@ -3,7 +3,8 @@
         {
             "name": "Win32",
             "includePath": [
-                "${workspaceFolder}/**"
+                "${workspaceFolder}/**",
+                "C:/Users/ThomasLEROY/.node-gyp/10.15.0/include/node/**"
             ],
             "defines": [
                 "_DEBUG",
