@@ -58,12 +58,6 @@
 #include "gdal.hpp"
 #include "utils/field_types.hpp"
 
-//vrt
-#include "vrt/gdal_vrtdataset.hpp"
-#include "vrt/gdal_vrtsources.hpp"
-#include "vrt/vrtdataset_bands.hpp"
-#include "vrt/gdal_vrtsourcedrasterband.hpp"
-
 //collections
 #include "collections/dataset_bands.hpp"
 #include "collections/dataset_layers.hpp"
@@ -240,11 +234,6 @@ namespace node_gdal {
 			Driver::Initialize(target);
 			Dataset::Initialize(target);
 			RasterBand::Initialize(target);
-
-			VrtDataset::Initialize(target);
-			VrtDatasetBands::Initialize(target);
-			VrtSimpleSource::Initialize(target);
-			VrtSourcedRasterBand::Initialize(target);
 
 			Layer::Initialize(target);
 			Feature::Initialize(target);

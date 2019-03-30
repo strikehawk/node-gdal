@@ -1,7 +1,5 @@
 #include "ptr_manager.hpp"
 #include "../gdal_dataset.hpp"
-#include "../vrt/gdal_vrtdataset.hpp"
-#include "../vrt/gdal_vrtsourcedrasterband.hpp"
 #include "../gdal_rasterband.hpp"
 #include "../gdal_layer.hpp"
 
@@ -10,9 +8,8 @@
 namespace node_gdal {
 
 PtrManager::PtrManager()
-	: uid(1), layers(), bands(), vrtbands(), datasets(), vrtdatasets()
+	: uid(1), layers(), bands(), datasets()
 {
-	LOG("PtrManager created");
 }
 
 PtrManager::~PtrManager()
@@ -22,7 +19,7 @@ PtrManager::~PtrManager()
 bool PtrManager::isAlive(long uid)
 {
 	if(uid == 0) return true;
-	return bands.count(uid) > 0 || layers.count(uid) > 0 || datasets.count(uid) > 0 || vrtdatasets.count(uid) > 0|| vrtbands.count(uid) > 0; 
+	return bands.count(uid) > 0 || layers.count(uid) > 0 || datasets.count(uid) > 0; 
 }
 
 long PtrManager::add(OGRLayer* ptr, long parent_uid, bool is_result_set)
@@ -52,36 +49,12 @@ long PtrManager::add(GDALRasterBand* ptr, long parent_uid)
 	return item->uid;
 }
 
-long PtrManager::add(VRTSourcedRasterBand* ptr, long parent_uid)
-{
-	LOG("Adding VRTSourcedRasterBand to ptr_manager");
-	PtrManagerVrtSourcedRasterBandItem *item = new PtrManagerVrtSourcedRasterBandItem();
-	item->uid = uid++;
-	item->parent = vrtdatasets[parent_uid];
-	item->ptr = ptr;
-	vrtbands[item->uid] = item;
-
-	PtrManagerVrtDatasetItem *parent = vrtdatasets[parent_uid];
-	parent->bands.push_back(item);
-	return item->uid;
-}
-
 long PtrManager::add(GDALDataset* ptr)
 {
 	PtrManagerDatasetItem *item = new PtrManagerDatasetItem();
 	item->uid = uid++;
 	item->ptr = ptr;
 	datasets[item->uid] = item;
-	return item->uid;
-}
-
-long PtrManager::add(VRTDataset* ptr)
-{
-	LOG("Adding VRTDataset to ptr_manager");
-	PtrManagerVrtDatasetItem *item = new PtrManagerVrtDatasetItem();
-	item->uid = uid++;
-	item->ptr = ptr;
-	vrtdatasets[item->uid] = item;
 	return item->uid;
 }
 
@@ -99,10 +72,8 @@ long PtrManager::add(OGRDataSource* ptr)
 void PtrManager::dispose(long uid)
 {
 	if(datasets.count(uid)) dispose(datasets[uid]);
-	else if(vrtdatasets.count(uid)) dispose(vrtdatasets[uid]);
 	else if(layers.count(uid)) dispose(layers[uid]);
 	else if(bands.count(uid)) dispose(bands[uid]);
-	else if(vrtbands.count(uid)) dispose(vrtbands[uid]);
 }
 
 void PtrManager::dispose(PtrManagerDatasetItem* item)
@@ -130,37 +101,10 @@ void PtrManager::dispose(PtrManagerDatasetItem* item)
 	delete item;
 }
 
-void PtrManager::dispose(PtrManagerVrtDatasetItem* item)
-{
-	vrtdatasets.erase(item->uid);
-
-	while(!item->layers.empty()){
-   		dispose(item->layers.back());
-	}
-	while(!item->bands.empty()){
-		dispose(item->bands.back());
-	}
-
-	if(item->ptr){
-		VrtDataset::vrtdataset_cache.erase(item->ptr);
-		GDALClose(item->ptr);
-	}
-
-	delete item;
-}
-
 void PtrManager::dispose(PtrManagerRasterBandItem* item)
 {
 	RasterBand::cache.erase(item->ptr);
 	bands.erase(item->uid);
-	item->parent->bands.remove(item);
-	delete item;
-}
-
-void PtrManager::dispose(PtrManagerVrtSourcedRasterBandItem* item)
-{
-	VrtSourcedRasterBand::cache.erase(item->ptr);
-	vrtbands.erase(item->uid);
 	item->parent->bands.remove(item);
 	delete item;
 }

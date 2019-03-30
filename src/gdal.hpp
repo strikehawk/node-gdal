@@ -22,10 +22,6 @@
 // apps
 #include "apps/gdal_translate.hpp"
 
-// vrt
-#include "vrt/gdal_vrtdataset.hpp"
-#include "vrt/vrtdataset_bands.hpp"
-
 using namespace v8;
 using namespace node;
 
