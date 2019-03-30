@@ -38,6 +38,7 @@
   },
   "scripts": {
     "configure": "./node_modules/.bin/node-pre-gyp -v rebuild",
+    "configure-log": "./node_modules/.bin/node-pre-gyp rebuild --enable_logging=true",
     "build": "./node_modules/.bin/node-gyp build",
     "test": "mocha test -R tap --timeout 600000 --no-colors -gc --require ./test/_common.js",
     "test-syntax": "eslint lib test --fix",

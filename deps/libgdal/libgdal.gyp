@@ -9,6 +9,7 @@
 			"type": "static_library",
 			"sources": [
 				"gdal/apps/ogr2ogr_lib.cpp",
+				"gdal/apps/gdal_translate_lib.cpp",
 				"gdal/frmts/gdalallregister.cpp",
 
 				"gdal/ogr/osr_cs_wkt.c",
@@ -276,6 +277,7 @@
 			],
 			"include_dirs": [
 				"./gdal/alg",
+				"./gdal/apps",
 				"./gdal/gcore",
 				"./gdal/port",
 				"./gdal/frmts",
@@ -310,8 +312,10 @@
 			"direct_dependent_settings": {
 				"include_dirs": [
 					"./gdal/alg",
+					"./gdal/apps",
 					"./gdal/gcore",
 					"./gdal/port",
+					"./gdal/frmts/vrt",
 					"./gdal/ogr",
 					"./gdal/ogr/ogrsf_frmts"
 				],

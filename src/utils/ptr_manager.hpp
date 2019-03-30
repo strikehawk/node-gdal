@@ -17,12 +17,17 @@
 // ogr
 #include <ogrsf_frmts.h>
 
+// vrt
+#include <gdal_vrt.h>
+#include <vrtdataset.h>
+
 #include <map>
 #include <list>
 
 using namespace v8;
 
 struct PtrManagerDatasetItem;
+struct PtrManagerVrtDatasetItem;
 struct PtrManagerLayerItem {
 	long uid;
 	PtrManagerDatasetItem *parent;
@@ -36,6 +41,12 @@ struct PtrManagerRasterBandItem {
 	GDALRasterBand *ptr;
 };
 
+struct PtrManagerVrtSourcedRasterBandItem {
+	long uid;
+	PtrManagerVrtDatasetItem *parent;
+	VRTSourcedRasterBand *ptr;
+};
+
 struct PtrManagerDatasetItem {
 	long uid;
 	std::list<PtrManagerLayerItem*> layers;
@@ -46,6 +57,14 @@ struct PtrManagerDatasetItem {
 	#endif
 };
 
+
+struct PtrManagerVrtDatasetItem {
+	long uid;
+	std::list<PtrManagerLayerItem*> layers;
+	std::list<PtrManagerVrtSourcedRasterBandItem*> bands;
+	VRTDataset *ptr;
+};
+
 namespace node_gdal {
 
 // A class for cleaning up GDAL objects that depend on open datasets 
@@ -53,10 +72,12 @@ namespace node_gdal {
 class PtrManager {
 public:
 	long add(GDALDataset* ptr);
+	long add(VRTDataset* ptr);
 	#if GDAL_VERSION_MAJOR < 2
 	long add(OGRDataSource* ptr);
 	#endif
 	long add(GDALRasterBand* ptr, long parent_uid);
+	long add(VRTSourcedRasterBand* ptr, long parent_uid);
 	long add(OGRLayer* ptr, long parent_uid, bool is_result_set);
 	void dispose(long uid);
 	bool isAlive(long uid);
@@ -67,10 +88,14 @@ private:
 	long uid;
 	void dispose(PtrManagerLayerItem* item);
 	void dispose(PtrManagerRasterBandItem* item);
+	void dispose(PtrManagerVrtSourcedRasterBandItem* item);
 	void dispose(PtrManagerDatasetItem* item);
+	void dispose(PtrManagerVrtDatasetItem* item);
 	std::map<long, PtrManagerLayerItem*> layers;
 	std::map<long, PtrManagerRasterBandItem*> bands;
+	std::map<long, PtrManagerVrtSourcedRasterBandItem*> vrtbands;
 	std::map<long, PtrManagerDatasetItem*> datasets;
+	std::map<long, PtrManagerVrtDatasetItem*> vrtdatasets;
 };
 
 }
