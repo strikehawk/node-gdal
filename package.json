@@ -36,6 +36,7 @@
     "url": "https://github.com/brandonreavis",
     "email": "brandon@naturalatlas.com"
   },
+  "files": ["lib/"],
   "scripts": {
     "configure": "./node_modules/.bin/node-pre-gyp -v rebuild",
     "configure-log": "./node_modules/.bin/node-pre-gyp rebuild --enable_logging=true",
