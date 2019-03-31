@@ -1,6 +1,4 @@
-var fs = require('fs');
 var gdal = require('../lib/gdal.js');
-var path = require('path');
 var assert = require('chai').assert;
 
 describe('gdal.translate', function () {
@@ -22,8 +20,7 @@ describe('gdal.translate', function () {
 
         it('validates source file path', function () {
             assert.throws(function () {
-                // negative resolution
-                gdal.translate("", [0,0,0,0], -1);
+                gdal.translate("", [0,0,0,0], 1, 1);
             });
         });
 
@@ -35,20 +32,27 @@ describe('gdal.translate', function () {
 
             assert.throws(function () {
                 // wrong type of args
-                gdal.translate(srcFilePath, [{},{},{},{}], 1);
+                gdal.translate(srcFilePath, [{},{},{},{}], 1, 1);
             });
         });
         
-        it('validates resolution', function () {
+        it('validates width', function () {
             assert.throws(function () {
-                // negative resolution
-                gdal.translate(srcFilePath, [0,0,0,0], -1);
+                // negative width
+                gdal.translate(srcFilePath, [0,0,0,0], -1, 1);
+            });
+        });
+                
+        it('validates height', function () {
+            assert.throws(function () {
+                // negative height
+                gdal.translate(srcFilePath, [0,0,0,0], 1, -1);
             });
         });
 
         it('accepts correct args', function() {
             gdal.startLogging("C:\\Projects\\GitHub\\custom.log");
-            const ds = gdal.translate(srcFilePath, [57,23,57.5,23.5], 400);
+            const ds = gdal.translate(srcFilePath, [57,23,57.5,23.5], 400, 400);
             assert.ok(ds);
             assert.instanceOf(ds, gdal.Dataset);
             gdal.stopLogging();

@@ -39,7 +39,7 @@ namespace node_gdal {
             return list;
         }
 
-        std::vector<std::string> buildParametersVector(Local<Array> bbox, int width)
+        std::vector<std::string> buildParametersVector(Local<Array> bbox, int width, int height)
         {
             Local<Value> val;
             double minx;
@@ -75,9 +75,6 @@ namespace node_gdal {
             }
             maxy = val->NumberValue();
 
-            // double width = maxx - minx;
-            // double height = maxy - miny;
-
             std::ostringstream ssMinx;
             ssMinx << minx;
 
@@ -89,16 +86,6 @@ namespace node_gdal {
 
             std::ostringstream ssMaxy;
             ssMaxy << maxy;
-
-            // std::ostringstream ssWidth;
-            // ssWidth << width;
-            
-            // std::ostringstream ssHeight;
-            // ssHeight << height;
-
-            // std::ostringstream ssResolution;
-            // ssResolution << resolution;
-
 
             std::vector<std::string> vector;
             vector.push_back("-of");
@@ -112,13 +99,17 @@ namespace node_gdal {
             // vector.push_back(ssResolution.str().c_str());
             // vector.push_back(ssResolution.str().c_str());
 
-            if (width != 0)
+            if (width != 0 || height != 0)
             {
                 std::ostringstream ssWidth;
                 ssWidth << width;
+
+                std::ostringstream ssHeight;
+                ssHeight << height;
+
                 vector.push_back("-outsize");
                 vector.push_back(ssWidth.str().c_str());
-                vector.push_back("0");
+                vector.push_back(ssHeight.str().c_str());
             }
 
             return vector;
@@ -180,10 +171,12 @@ namespace node_gdal {
         std::string srcFilePath("");
         Local<Array> bbox;
         int width;
+        int height;
 
         NODE_ARG_STR(0, "srcFilePath", srcFilePath);
         NODE_ARG_ARRAY(1, "bbox", bbox);
         NODE_ARG_INT(2, "width", width);
+        NODE_ARG_INT(3, "height", height);
 
         if (srcFilePath == "") {
             Nan::ThrowError("Source file path cannot be empty");
@@ -199,8 +192,13 @@ namespace node_gdal {
             Nan::ThrowError("Width must be positive");
 			return; 
         }
+        
+        if (height < 0) {
+            Nan::ThrowError("Height must be positive");
+			return; 
+        }
 
-        std::vector<std::string> vector = buildParametersVector(bbox, width);
+        std::vector<std::string> vector = buildParametersVector(bbox, width, height);
         if (vector.empty()) return;
 
         char** argsArray = toCharArray(vector);
