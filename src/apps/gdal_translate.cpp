@@ -59,7 +59,7 @@ namespace node_gdal {
                 Nan::ThrowError("Bbox array must only contain numbers");
                 return {};
             }
-            miny = val->NumberValue();
+            maxy = val->NumberValue();
 
             val = bbox->Get(2);
             if (!val->IsNumber()) {
@@ -73,7 +73,7 @@ namespace node_gdal {
                 Nan::ThrowError("Bbox array must only contain numbers");
                 return {};
             }
-            maxy = val->NumberValue();
+            miny = val->NumberValue();
 
             std::ostringstream ssMinx;
             ssMinx << minx;
@@ -95,9 +95,6 @@ namespace node_gdal {
             vector.push_back(ssMaxy.str().c_str());
             vector.push_back(ssMaxx.str().c_str());
             vector.push_back(ssMiny.str().c_str());
-            // vector.push_back("-tr");
-            // vector.push_back(ssResolution.str().c_str());
-            // vector.push_back(ssResolution.str().c_str());
 
             if (width != 0 || height != 0)
             {
@@ -206,7 +203,6 @@ namespace node_gdal {
         Local<Array> array = Nan::New<Array>(0);
         GDALDataset* ds = translateDataset(srcFilePath, argsArray, array);
 
-        LOG("Ready to return");
         info.GetReturnValue().Set(Dataset::New(ds));
     }
 } // namespace node_gdal

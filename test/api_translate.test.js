@@ -52,7 +52,7 @@ describe('gdal.translate', function () {
 
         it('accepts correct args', function() {
             gdal.startLogging("C:\\Projects\\GitHub\\custom.log");
-            const ds = gdal.translate(srcFilePath, [57,23,57.5,23.5], 400, 400);
+            const ds = gdal.translate(srcFilePath, [57,23.5,57.5,23], 400, 400);
             assert.ok(ds);
             assert.instanceOf(ds, gdal.Dataset);
             gdal.stopLogging();
