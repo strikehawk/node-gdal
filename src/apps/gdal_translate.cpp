@@ -1,6 +1,6 @@
 #include "../gdal_common.hpp"
-#include "gdal_translate.hpp"
 #include "../gdal_dataset.hpp"
+#include "gdal_translate.hpp"
 
 #include <sstream>
 #include <vector>
@@ -124,7 +124,7 @@ namespace node_gdal {
             return vector;
         }
 
-        void translateDataset(std::string srcFilePath, char** argsArray, Local<Array> array) 
+        GDALDataset* translateDataset(std::string srcFilePath, char** argsArray, Local<Array> array) 
         {
             // const char *resultName = "C:\\Projects\\GitHub\\result.tif";
             const char *resultName = "result";
@@ -138,7 +138,7 @@ namespace node_gdal {
             if (hSrcDs == NULL)
             {
                 LOG("Source dataset is null");
-                return;
+                return NULL;
             }
 
             // create translate options
@@ -146,55 +146,25 @@ namespace node_gdal {
             if (options == NULL)
             {
                 LOG("Options are null");
-                return;
+                return NULL;
             }
 
             GDALDatasetH hOutDs = GDALTranslate(resultName, hSrcDs, options, NULL);
             if (hOutDs == NULL)
             {
                 LOG("Output dataset is null");
-                return;
-            }
-            
-            GDALRasterBandH hBand = GDALGetRasterBand(hOutDs, 1);
-            if (hBand == NULL)
-            {
-                LOG("Raster band is null");
-                return;
-            }
-            
-            GDALRasterBand *poBand = static_cast<GDALRasterBand*>(hBand);
-            GDALRWFlag flag = GF_Read;
-            int width = poBand->GetXSize();
-            int height = poBand->GetYSize();
-
-            float* poBuffer = (float *) CPLMalloc(sizeof(float) * width * height);
-            int size = width * height;
-
-            CPLErr err = poBand->RasterIO(flag, 0, 0, width, height, poBuffer, width, height, GDT_Float32, 0, 0);
-
-            if (err) {
-                //NODE_THROW_CPLERR(err);
-                LOG("Error reading");
-                return;
+                return NULL;
             }
 
-            // fill result array
-            for (int i = 0; i < size; i++) {
-                array->Set(i, Nan::New(poBuffer[i]));
-            }
-
-            // close buffer
-            CPLFree(poBuffer);
-
-            // close datasets
+            // close dataset
             GDALClose(hSrcDs);
-            GDALClose(hOutDs);
 
             // free options
             GDALTranslateOptionsFree(options);
 
             popErrorHandler();
+
+            return (GDALDataset*) hOutDs;
         }
     }
 
@@ -236,8 +206,9 @@ namespace node_gdal {
         char** argsArray = toCharArray(vector);
 
         Local<Array> array = Nan::New<Array>(0);
-        translateDataset(srcFilePath, argsArray, array);
+        GDALDataset* ds = translateDataset(srcFilePath, argsArray, array);
 
-        info.GetReturnValue().Set(array);
+        LOG("Ready to return");
+        info.GetReturnValue().Set(Dataset::New(ds));
     }
 } // namespace node_gdal

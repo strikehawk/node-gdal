@@ -48,9 +48,9 @@ describe('gdal.translate', function () {
 
         it('accepts correct args', function() {
             gdal.startLogging("C:\\Projects\\GitHub\\custom.log");
-            const res = gdal.translate(srcFilePath, [57,23,57.5,23.5], 400);
-            console.log("Translate result: " + res);
-            assert.ok(res);
+            const ds = gdal.translate(srcFilePath, [57,23,57.5,23.5], 400);
+            assert.ok(ds);
+            assert.instanceOf(ds, gdal.Dataset);
             gdal.stopLogging();
         });
     });
