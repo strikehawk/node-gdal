@@ -4,7 +4,8 @@
             "name": "Win32",
             "includePath": [
                 "${workspaceFolder}/**",
-                "C:/Users/ThomasLEROY/.node-gyp/10.15.0/include/node/**"
+                "C:/Users/ThomasLEROY/.node-gyp/10.15.0/include/node/**",
+                "${workspaceFolder}/deps/libgdal/gdal/alg"
             ],
             "defines": [
                 "_DEBUG",
